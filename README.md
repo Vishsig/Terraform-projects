@@ -18,6 +18,7 @@ Terraform learning sprint documenting practical AWS Infrastructure as Code (IaC)
 | 10 | Static Website Project | CloudFront, OAC, S3 bucket policies, `fileset` function | S3 Website + CloudFront CDN |
 | 11 | VPC Peering Demo | Multi-region providers, VPC peering, Route Tables, Aliases | VPCs, EC2s, Peering Connection |
 | 12 | IAM & CSV Processing | `csvdecode`, `for_each`, complex data filtering (`regex`, `can`) | IAM Users, Profiles, Groups |
+| 13 | Blue-Green Deployment | Elastic Beanstalk environments, CNAME Swapping, Zero-downtime deployment | Elastic Beanstalk App, Environments |
 
 ## 🚀 Quick Start (Any Day)
 
@@ -49,7 +50,8 @@ terraform-learning/
 │   ├── day_09/             # Data sources and querying AWS
 │   ├── day_10/             # CloudFront + S3 Static Website project
 │   ├── day_11/             # Multi-region VPC Peering Demo
-│   └── day_12/             # IAM users & groups scaling with CSV decode
+│   ├── day_12/             # IAM users & groups scaling with CSV decode
+│   └── day_13/             # AWS Elastic Beanstalk Blue-Green Deployment
 ├── screenshots/            # AWS Console proof
 └── .gitignore              # Protects .terraform/, tfstate
 ```

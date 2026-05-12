@@ -22,6 +22,8 @@ Terraform learning sprint documenting practical AWS Infrastructure as Code (IaC)
 | 14 | Serverless Image Processing | Lambda functions, layers, S3 event notifications, IAM policies | S3 Buckets, Lambda |
 | 15 | Terraform Provisioners | `local-exec`, `remote-exec`, `file` provisioners on EC2 | EC2 instance, provisioner scripts |
 | 16 | Production EKS Cluster | Custom modules, VPC tags, IAM roles, Managed Node Groups | EKS Cluster, VPC, IAM, Node Groups |
+| 17 | Terraform IAM Policies and Governance | IAM roles, policies, attachments structure | IAM |
+| 18 | 2-Tier Application Architecture | Web server + RDS database, Security groups, Secrets Manager | VPC, EC2, RDS, Secrets |
 
 ## 🚀 Quick Start (Any Day)
 
@@ -57,7 +59,8 @@ terraform-learning/
 │   ├── day_13/             # AWS Elastic Beanstalk Blue-Green Deployment
 │   ├── day_14/             # Serverless Image Processing (S3 + Lambda)
 │   ├── day_15/             # Terraform Provisioners (local-exec, remote-exec, file)
-│   └── day_16/             # Production EKS Cluster with Custom Modules
-├── screenshots/            # AWS Console proof
+│   ├── day_16/             # Production EKS Cluster with Custom Modules
+│   ├── day_17/             # Terraform IAM Policies and Governance
+│   └── day_18/             # 2-Tier AWS Architecture (Web + RDS)
 └── .gitignore              # Protects .terraform/, tfstate
 ```

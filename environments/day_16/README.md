@@ -1,4 +1,4 @@
-# Day 20: EKS Cluster with Terraform
+# Day 16: EKS Cluster with Terraform
 
 This configuration creates a production-ready Amazon EKS (Elastic Kubernetes Service) cluster using Terraform with the latest AWS Provider 6.x.
 

@@ -1,4 +1,4 @@
-# Terraform Learning
+# Terraform Projects
 
 Terraform learning sprint documenting practical AWS Infrastructure as Code (IaC). Progresses from basic syntax to production-ready structure—perfect showcasing S3, EC2, remote state, variables, file organization, CloudFront, and more.
 

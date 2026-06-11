@@ -24,6 +24,7 @@ Terraform learning sprint documenting practical AWS Infrastructure as Code (IaC)
 | 16 | Production EKS Cluster | Custom modules, VPC tags, IAM roles, Managed Node Groups | EKS Cluster, VPC, IAM, Node Groups |
 | 17 | Terraform IAM Policies and Governance | IAM roles, policies, attachments structure | IAM |
 | 18 | 2-Tier Application Architecture | Web server + RDS database, Security groups, Secrets Manager | VPC, EC2, RDS, Secrets |
+| 19 | End-to-End observability project | CloudTrail, CloudWatch Logs, Metric Filters, SNS | S3, CloudTrail, CloudWatch, SNS |
 
 ## 🚀 Quick Start (Any Day)
 
@@ -61,6 +62,7 @@ terraform-learning/
 │   ├── day_15/             # Terraform Provisioners (local-exec, remote-exec, file)
 │   ├── day_16/             # Production EKS Cluster with Custom Modules
 │   ├── day_17/             # Terraform IAM Policies and Governance
-│   └── day_18/             # 2-Tier AWS Architecture (Web + RDS)
+│   ├── day_18/             # 2-Tier AWS Architecture (Web + RDS)
+│   └── day_19/             # End-to-End observability project
 └── .gitignore              # Protects .terraform/, tfstate
 ```

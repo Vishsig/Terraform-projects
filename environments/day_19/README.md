@@ -78,3 +78,4 @@ To destroy the resources:
 ```bash
 terraform destroy -var="security_alert_email=your-email@example.com"
 ```
+

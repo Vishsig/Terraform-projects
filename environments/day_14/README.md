@@ -182,3 +182,4 @@ variants['your_variant'].save(buffer, format='JPEG', quality=75)
 - Max image size: Limited by Lambda memory (1024 MB)
 - Supported regions: All AWS regions
 - No frontend required - pure backend automation
+

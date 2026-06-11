@@ -174,3 +174,4 @@ Deploys an Ubuntu EC2 instance with:
 | `rds_endpoint` | RDS instance endpoint |
 | `rds_port` | RDS instance port |
 | `database_name` | Name of the database |
+

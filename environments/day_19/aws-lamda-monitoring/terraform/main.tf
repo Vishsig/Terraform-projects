@@ -40,6 +40,13 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/lambda_function.zip"
 }
 
+# Data source for Threat Detector Lambda zip
+data "archive_file" "threat_detector_zip" {
+  type        = "zip"
+  source_file = "${path.module}/../lambda/threat_detector.py"
+  output_path = "${path.module}/threat_detector.zip"
+}
+
 # ============================================================================
 # MODULE: SNS NOTIFICATIONS
 # Creates SNS topics and subscriptions for alerts
@@ -179,6 +186,38 @@ module "log_alerts" {
   log_group_name       = module.lambda_function.log_group_name
   log_alerts_topic_arn = module.sns_notifications.log_alerts_topic_arn
   metric_namespace     = var.metric_namespace
+
+  tags = local.common_tags
+}
+
+# ============================================================================
+# MODULE: THREAT DETECTION (Sub-60-Second Real-Time Security)
+# Uses CloudWatch Logs Subscription Filter → Lambda for near real-time
+# threat detection, bypassing the 5-15 min CloudTrail delay
+# ============================================================================
+
+module "threat_detection" {
+  source = "./modules/threat_detection"
+
+  project_name    = var.project_name
+  environment     = var.environment
+  aws_region      = var.aws_region
+
+  # Connect to the image processor's log group for real-time analysis
+  source_log_group_name = module.lambda_function.log_group_name
+  source_log_group_arn  = module.lambda_function.log_group_arn
+
+  # Threat detector Lambda package
+  threat_detector_zip_path    = data.archive_file.threat_detector_zip.output_path
+  threat_detector_source_hash = data.archive_file.threat_detector_zip.output_base64sha256
+
+  # Security alerting
+  security_alert_email      = var.alert_email
+  security_alert_sms        = var.alert_sms
+  security_metric_namespace = var.security_metric_namespace
+
+  log_level          = var.log_level
+  log_retention_days = var.log_retention_days
 
   tags = local.common_tags
 }

@@ -136,3 +136,14 @@ variable "enable_no_invocation_alarm" {
   type        = bool
   default     = false
 }
+
+# ============================================================================
+# THREAT DETECTION CONFIGURATION
+# ============================================================================
+
+variable "security_metric_namespace" {
+  description = "CloudWatch metrics namespace for security/threat detection metrics"
+  type        = string
+  default     = "ImageProcessor/Security"
+}
+

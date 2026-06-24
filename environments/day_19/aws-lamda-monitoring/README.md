@@ -33,7 +33,8 @@ This project demonstrates AWS serverless best practices by combining:
                          ▼
                  ┌───────────────┐
                  │  Lambda       │
-                 │  Function     │
+                 │  Image        │
+                 │  Processor    │
                  └───────┬───────┘
                          │
         ┌────────────────┼────────────────┐
@@ -44,11 +45,35 @@ This project demonstrates AWS serverless best practices by combining:
 │   Bucket    │  │   Logs      │  │  Topics     │
 └─────────────┘  └──────┬──────┘  └──────┬──────┘
                         │                 │
-                        ▼                 ▼
-                 ┌─────────────┐   ┌─────────────┐
-                 │ Metrics &   │   │   Email/    │
-                 │  Alarms     │   │    SMS      │
-                 └─────────────┘   └─────────────┘
+              ┌─────────┼─────────┐       ▼
+              │         │         │ ┌─────────────┐
+              ▼         ▼         │ │   Email/    │
+       ┌───────────┐ ┌────────┐   │ │    SMS      │
+       │ Metrics & │ │Sub.    │   │ └─────────────┘
+       │  Alarms   │ │Filter  │   │
+       └───────────┘ └───┬────┘   │
+                         │ ~2-10s │
+                         ▼        │
+                 ┌───────────────┐ │
+                 │  Threat       │ │
+                 │  Detector     │ │
+                 │  Lambda       │ │
+                 └───────┬───────┘ │
+                         │         │
+                    ┌────┴────┐    │
+                    ▼         ▼    │
+             ┌──────────┐ ┌───────────┐
+             │ Security │ │   SNS     │
+             │ Metrics  │ │ Security  │
+             │ & Alarms │ │  Alert    │
+             └──────────┘ └─────┬─────┘
+                                │
+                                ▼
+                          ┌───────────┐
+                          │  Email/   │
+                          │  SMS      │
+                          │ (<60 sec) │
+                          └───────────┘
 ```
 
 ---
@@ -63,20 +88,38 @@ This project demonstrates AWS serverless best practices by combining:
 - ✅ Large image resizing (max 4096px)
 - ✅ Automatic color space conversion
 
+### 🛡️ Real-Time Threat Detection (Sub-60-Second)
+- ✅ **CloudWatch Logs Subscription Filter → Lambda pipeline** for near real-time detection
+- ✅ **5 Threat Categories Detected**:
+  - Rapid-fire errors (brute force / fuzzing attacks)
+  - S3 Access Denied patterns (unauthorized access attempts)
+  - Suspicious file extensions (malware upload attempts)
+  - Injection attempts (path traversal, command injection, XSS)
+  - Abnormal payload sizes (DoS / data exfiltration)
+- ✅ **Dedicated Security SNS Topic** with email/SMS alerts
+- ✅ **3 Security-Specific Alarms**:
+  - Threats detected alarm
+  - Detection latency alarm (ensures <60s target is met)
+  - Detector health alarm
+- ✅ **Security Custom Metrics** (ThreatsDetected, EventsAnalyzed, DetectionLatencyMs)
+- ✅ **Detailed Alert Messages** with severity, evidence, and recommended actions
+
 ### Monitoring & Observability
-- ✅ **12 CloudWatch Alarms**:
+- ✅ **15 CloudWatch Alarms** (12 existing + 3 security):
   - Error rate monitoring
   - Duration/timeout warnings
   - Throttle detection
   - Memory usage tracking
   - Concurrent execution limits
   - Log-based error patterns
+  - **Threat detection alarms**
   
 - ✅ **Custom Metrics**:
   - Image processing time
   - Image sizes processed
   - Success/failure rates
   - Business-level insights
+  - **Security threat metrics**
   
 - ✅ **Comprehensive Dashboard**:
   - Real-time metrics visualization
@@ -92,8 +135,9 @@ This project demonstrates AWS serverless best practices by combining:
   - Critical application errors
 
 ### Infrastructure
-- ✅ **Modular Terraform** (6 reusable modules)
+- ✅ **Modular Terraform** (7 reusable modules)
 - ✅ **Security best practices** (IAM least privilege, S3 encryption)
+- ✅ **Real-time security monitoring** (sub-60-second threat detection)
 - ✅ **Scalable architecture** (auto-scaling Lambda)
 - ✅ **Cost-optimized** (pay per use)
 - ✅ **Environment-agnostic** (dev/staging/prod)
@@ -106,6 +150,7 @@ This project demonstrates AWS serverless best practices by combining:
 aws-lamda-monitoring/
 ├── lambda/
 │   ├── lambda_function.py       # Enhanced Lambda with structured logging
+│   ├── threat_detector.py       # 🛡️ Real-time threat detection Lambda
 │   └── requirements.txt         # Python dependencies (Pillow)
 ├── scripts/
 │   ├── build_layer_docker.sh   # Build Pillow layer using Docker
@@ -123,7 +168,8 @@ aws-lamda-monitoring/
 │       ├── sns_notifications/  # SNS topics + subscriptions
 │       ├── cloudwatch_metrics/ # Metrics, filters, dashboard
 │       ├── cloudwatch_alarms/  # Standard CloudWatch alarms
-│       └── log_alerts/         # Log-based metric filters + alarms
+│       ├── log_alerts/         # Log-based metric filters + alarms
+│       └── threat_detection/   # 🛡️ Real-time threat detection (<60s)
 ├── DEMO_GUIDE.md               # Video presentation guide
 └── README.md                   # This file
 ```
@@ -280,12 +326,18 @@ The automatically created dashboard includes:
 - `critical-errors` - CRITICAL log level
 - `large-images` - Large image performance warning
 
+**🛡️ Security/Threat Detection Alarms (3):**
+- `threats-detected` - Fires when any security threat is identified
+- `detection-latency` - Warns if detection time approaches 60-second target
+- `detector-errors` - Alerts if the threat detector itself fails
+
 ### SNS Topics
 
-Three separate topics for different alert severities:
+Four separate topics for different alert severities:
 - **Critical Alerts** - Errors, failures, timeouts
 - **Performance Alerts** - Duration, memory, throttles
 - **Log Alerts** - Pattern-based log alerts
+- **🛡️ Security Alerts** - Real-time threat detection alerts (<60s)
 
 ### Custom Metrics
 
@@ -297,6 +349,11 @@ Emitted from Lambda code and log filters:
 - `ImageSizeBytes` - From log filter
 - `TimeoutErrors` - From log filter
 - `MemoryErrors` - From log filter
+
+**🛡️ Security Metrics** (namespace: `ImageProcessor/Security`):
+- `ThreatsDetected` - Number of threats identified per invocation
+- `EventsAnalyzed` - Number of log events analyzed per invocation
+- `DetectionLatencyMs` - Time taken to analyze and detect threats
 
 ---
 
@@ -573,6 +630,21 @@ Creates log-based metric filters and alarms.
 
 **Inputs:** function_name, log_group_name, SNS topic ARN
 **Outputs:** alarm_arns, alarm_names
+
+### Module: `threat_detection` 🛡️
+Creates a real-time threat detection pipeline using CloudWatch Logs Subscription Filters and a dedicated Lambda function. Detects threats in under 60 seconds by bypassing the CloudTrail delay.
+
+**Inputs:** project_name, environment, source_log_group_name/arn, threat_detector_zip_path, security_alert_email
+**Outputs:** threat_detector_function_arn, security_alerts_topic_arn, security_alarm_names
+
+**Detection Pipeline:** CloudWatch Logs → Subscription Filter → Threat Detector Lambda → SNS Alert
+
+**Threats Detected:**
+- Rapid-fire errors (brute force / fuzzing)
+- Access Denied patterns (unauthorized access)
+- Suspicious file extensions (malware uploads)
+- Injection attempts (path traversal, command injection)
+- Abnormal payload sizes (DoS / exfiltration)
 
 ---
 

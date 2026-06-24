@@ -135,3 +135,42 @@ output "sns_subscription_note" {
   description = "Important note about SNS email subscriptions"
   value       = var.alert_email != "" ? "⚠️  IMPORTANT: Check your email (${var.alert_email}) and confirm SNS subscription(s) to receive alerts!" : "No email configured for alerts"
 }
+
+# ============================================================================
+# THREAT DETECTION OUTPUTS
+# ============================================================================
+
+output "threat_detector_function_name" {
+  description = "Name of the threat detector Lambda function"
+  value       = module.threat_detection.threat_detector_function_name
+}
+
+output "threat_detector_function_arn" {
+  description = "ARN of the threat detector Lambda function"
+  value       = module.threat_detection.threat_detector_function_arn
+}
+
+output "threat_detector_log_group" {
+  description = "CloudWatch Log Group for the threat detector"
+  value       = module.threat_detection.threat_detector_log_group_name
+}
+
+output "security_alerts_topic_arn" {
+  description = "ARN of the security alerts SNS topic"
+  value       = module.threat_detection.security_alerts_topic_arn
+}
+
+output "security_alarms" {
+  description = "List of all security alarm names"
+  value = {
+    threats_detected   = module.threat_detection.security_alarm_names[0]
+    detection_latency  = module.threat_detection.security_alarm_names[1]
+    detector_errors    = module.threat_detection.security_alarm_names[2]
+  }
+}
+
+output "threat_detection_pipeline" {
+  description = "Description of the real-time threat detection pipeline"
+  value       = "CloudWatch Logs → Subscription Filter → Threat Detector Lambda → SNS Alert (target: <60s detection)"
+}
+
